@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	QtyPrecision   = 4
+	QtyPrecision   = 3
 	PricePrecision = 1
 )
 

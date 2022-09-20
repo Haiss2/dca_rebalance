@@ -72,7 +72,7 @@ func run(c *cli.Context) error {
 	shortTrade := trade.NewTradeModule(shortClient)
 
 	// initiate hunter and hunt
-	hunter := hunter.NewHunter(c, synth, longTrade, shortTrade, tele)
+	hunter := hunter.NewHunter(c, symbol, synth, longTrade, shortTrade, tele)
 	go hunter.Hunt()
 
 	// initiate and run server
