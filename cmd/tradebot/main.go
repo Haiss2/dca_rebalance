@@ -68,11 +68,11 @@ func run(c *cli.Context) error {
 	synth := pricing.NewSynthetic(symbol, longClient, db, duration)
 
 	// initiate trade module
-	longTrade := trade.NewTradeModule(longClient)
-	shortTrade := trade.NewTradeModule(shortClient)
+	longer := trade.NewTradeModule(longClient)
+	shorter := trade.NewTradeModule(shortClient)
 
 	// initiate hunter and hunt
-	hunter := hunter.NewHunter(c, symbol, synth, longTrade, shortTrade, tele)
+	hunter := hunter.NewHunter(c, symbol, synth, longer, shorter, tele)
 	go hunter.Hunt()
 
 	// initiate and run server
