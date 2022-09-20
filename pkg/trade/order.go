@@ -43,12 +43,11 @@ func (t *TradeModule) CancelAllOrder(symbol string) error {
 }
 
 func (t *TradeModule) CreateMarketOrder(symbol string, qty float64, side futu.SideType) (*futu.Order, error) {
-	precision := t.configs[symbol].PricePrecision
 	order, err := t.client.NewCreateOrderService().
 		Symbol(symbol).
 		Side(side).
 		Type(futu.OrderTypeMarket).
-		Quantity(fmt.Sprintf("%f", RoundDown(qty, precision))).
+		Quantity(fmt.Sprintf("%f", RoundDown(qty, PricePrecision))).
 		Do(context.Background())
 	if err != nil {
 		t.l.Infow("cannot create order", "err", err)
@@ -59,14 +58,13 @@ func (t *TradeModule) CreateMarketOrder(symbol string, qty float64, side futu.Si
 }
 
 func (t *TradeModule) CreateLimitOrder(symbol string, price, qty float64, side futu.SideType) (*futu.Order, error) {
-	c := t.configs[symbol]
 	order, err := t.client.NewCreateOrderService().
 		Symbol(symbol).
 		Side(side).
 		Type(futu.OrderTypeLimit).
 		TimeInForce(futu.TimeInForceTypeGTC).
-		Price(fmt.Sprintf("%f", RoundDown(price, c.PricePrecision))).
-		Quantity(fmt.Sprintf("%f", RoundDown(qty, c.QtyPrecision))).
+		Price(fmt.Sprintf("%f", RoundDown(price, PricePrecision))).
+		Quantity(fmt.Sprintf("%f", RoundDown(qty, QtyPrecision))).
 		ReduceOnly(false).
 		Do(context.Background())
 	if err != nil {

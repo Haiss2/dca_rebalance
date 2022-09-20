@@ -3,26 +3,24 @@ package trade
 import (
 	"context"
 
-	"github.com/Haiss2/dca/pkg/common"
 	futu "github.com/adshao/go-binance/v2/futures"
 	"go.uber.org/zap"
 )
 
+const (
+	QtyPrecision   = 4
+	PricePrecision = 1
+)
+
 type TradeModule struct {
-	l       *zap.SugaredLogger
-	client  *futu.Client
-	configs map[string]common.SymbolConfig
+	l      *zap.SugaredLogger
+	client *futu.Client
 }
 
-func NewTradeModule(client *futu.Client, configs []common.SymbolConfig) *TradeModule {
-	configsM := make(map[string]common.SymbolConfig)
-	for _, config := range configs {
-		configsM[config.Symbol] = config
-	}
+func NewTradeModule(client *futu.Client) *TradeModule {
 	return &TradeModule{
-		l:       zap.S(),
-		client:  client,
-		configs: configsM,
+		l:      zap.S(),
+		client: client,
 	}
 }
 

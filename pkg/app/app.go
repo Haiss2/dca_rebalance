@@ -12,6 +12,7 @@ func NewApp() *cli.App {
 }
 
 const (
+	SymbolFlag            = "symbol"
 	BindAddressFlag       = "bind-address"
 	StoreDurationFlag     = "store-duration"
 	LongClientIdFlag      = "long-client-id"
@@ -26,6 +27,12 @@ func NewAppFlags() []cli.Flag {
 			Name:   BindAddressFlag,
 			Usage:  "provide application host and port",
 			EnvVar: "BIND_ADDRESS",
+		},
+
+		cli.StringFlag{
+			Name:   SymbolFlag,
+			Usage:  "provide symbol for trading",
+			EnvVar: "SYMBOL",
 		},
 
 		cli.DurationFlag{
