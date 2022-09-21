@@ -76,7 +76,14 @@ func getAsset(assets []trade.Asset, token string) float64 {
 	return 0
 }
 
-func (h *Hunter) checkPositionsWhenStaringApp() (pass bool, err error) {
+type DcaJob struct {
+	LongPrice   float64
+	LongAmount  float64
+	ShortPrice  float64
+	ShortAmount float64
+}
+
+func (h *Hunter) checkPositionsWhenStaringApp() (pass bool, job DcaJob, err error) {
 	// cancel order for longer
 	err = h.longer.CancelAllOrder(h.symbol)
 	if err != nil {
@@ -94,33 +101,37 @@ func (h *Hunter) checkPositionsWhenStaringApp() (pass bool, err error) {
 	var openedLong, openedShort bool
 
 	// get longer position
-	pos, err := h.longer.GetPosition(h.symbol)
+	lPos, err := h.longer.GetPosition(h.symbol)
 	if err != nil {
 		h.l.Errorw("failed to get position for longer", "err", err)
 		return
 	}
-	p := pos[0]
-	amount, _ := strconv.ParseFloat(p.PositionAmt, 64)
-	if amount > 0 {
-		openedLong = true
-	}
+	lp := lPos[0]
+	amount, _ := strconv.ParseFloat(lp.PositionAmt, 64)
+	openedLong = amount > 0
 
 	// get shorter position
-	pos, err = h.shorter.GetPosition(h.symbol)
+	sPos, err := h.shorter.GetPosition(h.symbol)
 	if err != nil {
 		h.l.Errorw("failed to get position for shorter", "err", err)
 		return
 	}
-	p = pos[0]
-	amount, _ = strconv.ParseFloat(p.PositionAmt, 64)
-	if amount > 0 {
-		openedShort = true
-	}
+	sp := sPos[0]
+	amount, _ = strconv.ParseFloat(sp.PositionAmt, 64)
+	openedShort = amount < 0
+
+	h.l.Debugw("opening positions return from checkPositionsWhenStaringApp", "long", lp, "short", sp)
 
 	if openedLong != openedShort {
-		err = errors.New("2 ways need the same state")
+		err = errors.New("2 ways need to same state")
 		return
 	}
 
-	return openedLong, nil
+	// pass means no open position
+	return !openedLong, DcaJob{
+		LongPrice:   trade.SToF(lp.EntryPrice),
+		LongAmount:  trade.SToF(lp.PositionAmt),
+		ShortPrice:  trade.SToF(sp.EntryPrice),
+		ShortAmount: trade.SToF(sp.PositionAmt),
+	}, nil
 }

@@ -1,5 +1,7 @@
 package hunter
 
-func (h *Hunter) Dca() {
+const ()
 
+func (h *Hunter) Dca(job DcaJob) {
+	h.l.Debugw("Dca job", "job", job)
 }

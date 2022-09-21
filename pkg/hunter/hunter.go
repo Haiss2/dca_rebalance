@@ -53,7 +53,7 @@ func NewHunter(
 
 func (h *Hunter) Hunt() {
 	// Firstly we have to maintain old position when staring app
-	pass, err := h.checkPositionsWhenStaringApp()
+	pass, job, err := h.checkPositionsWhenStaringApp()
 	if err != nil {
 		h.l.Errorw("Failed to start hunter", "err", err)
 		return
@@ -61,8 +61,8 @@ func (h *Hunter) Hunt() {
 
 	if pass { // no opened positions
 		h.HuntAndTrade()
-	} else {
-		h.Dca()
+	} else { // there are 2 opposite side positions
+		h.Dca(job)
 	}
 }
 
